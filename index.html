@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Geometry Calculator</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+      color: #333;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .overlay {
+      background-color: rgba(255,255,255,0.95);
+      max-width: 650px;
+      margin: 60px auto;
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 0 30px rgba(0,0,0,0.6);
+      animation: fadeIn 2s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h2 {
+      text-align: center;
+      color: #203a43;
+      text-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+    }
+
+    label { display: block; margin-top: 10px; font-weight: bold; }
+    select, input {
+      margin-top: 5px;
+      padding: 8px;
+      width: 100%;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      background: #203a43;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: #2c5364;
+      transform: scale(1.05);
+    }
+
+    .box {
+      border: 1px solid #ccc;
+      padding: 20px;
+      margin-top: 20px;
+      border-radius: 10px;
+      background: #f9f9f9;
+    }
+
+    /* Login Screen */
+    #loginScreen {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.9);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+
+    #loginBox {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(255,255,255,0.5);
+      text-align: center;
+      animation: zoomIn 1s ease;
+    }
+
+    @keyframes zoomIn {
+      from { transform: scale(0.5); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    #loginBox input {
+      margin: 10px 0;
+      padding: 10px;
+      width: 80%;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Login Screen -->
+<div id="loginScreen">
+  <div id="loginBox">
+    <h2>🔐 Login</h2>
+    <input type="text" id="loginId" placeholder="Enter ID">
+    <input type="password" id="loginPassword" placeholder="Enter Password">
+    <button onclick="login()">Login</button>
+    <p id="loginMessage" style="color:red;"></p>
+  </div>
+</div>
+
+<!-- Calculator -->
+<div class="overlay" id="calculator" style="display:none;">
+  <h2>🎬 Area / Perimeter / Volume Calculator</h2>
+
+  <div class="box">
+    <label for="shape">Choose a shape:</label>
+    <select id="shape" onchange="updateInputs()">
+      <option value="square">Square (2D)</option>
+      <option value="rectangle">Rectangle (2D)</option>
+      <option value="circle">Circle (2D)</option>
+      <option value="triangle">Triangle (2D)</option>
+      <option value="cube">Cube (3D)</option>
+      <option value="cuboid">Cuboid (3D)</option>
+      <option value="cylinder">Cylinder (3D)</option>
+      <option value="sphere">Sphere (3D)</option>
+    </select>
+
+    <div id="inputs"></div>
+
+    <button onclick="calculate()">Calculate</button>
+
+    <h3>Result</h3>
+    <p id="resultArea">Area: -</p>
+    <p id="resultPerimeter">Perimeter / Circumference: -</p>
+    <p id="resultVolume">Volume: -</p>
+  </div>
+</div>
+
+<script>
+  // Login System
+  function login() {
+    const id = document.getElementById('loginId').value;
+    const pass = document.getElementById('loginPassword').value;
+    if (id === "admin" && pass === "1234") {
+      document.getElementById('loginScreen').style.display = "none";
+      document.getElementById('calculator').style.display = "block";
+    } else {
+      document.getElementById('loginMessage').innerText = "Invalid ID or Password!";
+    }
+  }
+
+  function updateInputs() {
+    const shape = document.getElementById('shape').value;
+    const inputsDiv = document.getElementById('inputs');
+    let html = '';
+
+    if (shape === 'square') {
+      html += '<label>Side (s): <input type="number" id="s" step="any"></label>';
+    } else if (shape === 'rectangle') {
+      html += '<label>Length (l): <input type="number" id="l" step="any"></label>';
+      html += '<label>Breadth (b): <input type="number" id="b" step="any"></label>';
+    } else if (shape === 'circle') {
+      html += '<label>Radius (r): <input type="number" id="r" step="any"></label>';
+    } else if (shape === 'triangle') {
+      html += '<label>Side a: <input type="number" id="a" step="any"></label>';
+      html += '<label>Side b: <input type="number" id="b" step="any"></label>';
+      html += '<label>Side c: <input type="number" id="c" step="any"></label>';
+      html += '<label>Base (for area) bₐ: <input type="number" id="base" step="any"></label>';
+      html += '<label>Height (for area) h: <input type="number" id="h" step="any"></label>';
+    } else if (shape === 'cube') {
+      html += '<label>Side (a): <input type="number" id="a" step="any"></label>';
+    } else if (shape === 'cuboid') {
+      html += '<label>Length (l): <input type="number" id="l" step="any"></label>';
+      html += '<label>Breadth (b): <input type="number" id="b" step="any"></label>';
+      html += '<label>Height (h): <input type="number" id="h" step="any"></label>';
+    } else if (shape === 'cylinder') {
+      html += '<label>Radius (r): <input type="number" id="r" step="any"></label>';
+      html += '<label>Height (h): <input type="number" id="h" step="any"></label>';
+    } else if (shape === 'sphere') {
+      html += '<label>Radius (r): <input type="number" id="r" step="any"></label>';
+    }
+
+    inputsDiv.innerHTML = html;
+    document.getElementById('resultArea').innerText = 'Area: -';
+    document.getElementById('resultPerimeter').innerText = 'Perimeter / Circumference: -';
+    document.getElementById('resultVolume').innerText = 'Volume: -';
+  }
+
+  function calculate() {
+    const shape = document.getElementById('shape').value;
+    let area = null;
+    let perimeter = null;
+    let volume = null;
+    const pi = Math.PI;
+
+    if (shape === 'square') {
+      const s = parseFloat(document.getElementById('s').value);
+      if (isNaN(s)) { alert('Enter side'); return; }
+      area = s * s;
+      perimeter = 4 * s;
+    }
