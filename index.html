@@ -79,7 +79,7 @@
     <h2>🔐 Login</h2>
     <input type="text" id="loginId" placeholder="Enter ID">
     <input type="password" id="loginPassword" placeholder="Enter Password">
-    <button onclick="login()">Login</button>
+    <button id="loginBtn">Login</button>
     <p id="loginMessage" style="color:red;"></p>
   </div>
 </div>
@@ -109,10 +109,12 @@
 </div>
 
 <script>
-  // Login System
+  // Attach login button event
+  document.getElementById("loginBtn").addEventListener("click", login);
+
   function login() {
-    const id = document.getElementById('loginId').value;
-    const pass = document.getElementById('loginPassword').value;
+    const id = document.getElementById('loginId').value.trim();
+    const pass = document.getElementById('loginPassword').value.trim();
     if (id === "admin" && pass === "1234") {
       document.getElementById('loginScreen').style.display = "none";
       document.getElementById('calculator').style.display = "block";
@@ -163,9 +165,4 @@
     const pi = Math.PI;
     if (shape === 'square') {
       const s = parseFloat(document.getElementById('s').value);
-      if (isNaN(s)) { alert('Enter side'); return; }
-      area = s * s; perimeter = 4 * s;
-    } else if (shape === 'rectangle') {
-      const l = parseFloat(document.getElementById('l').value);
-      const b = parseFloat(document.getElementById('b').value);
-      if (isNaN
+     
